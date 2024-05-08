@@ -1,0 +1,12 @@
+
+
+SELECT title, price, topic
+    FROM book_library.books b1
+        WHERE price = (
+        SELECT MAX(price)
+            FROM book_library.books b2
+            WHERE b2.topic = b1.topic)
+        OR b1.topic IS NULL AND b1.price =
+         (SELECT MAX(price)
+            from book_library.books
+            WHERE topic IS NULL);
