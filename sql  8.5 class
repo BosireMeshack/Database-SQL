@@ -1,0 +1,54 @@
+--ddl
+
+CREATE TABLE owner
+(
+ id NUMBER(5) CONSTRAINT owner_pk PRIMARY KEY,
+ name VARCHAR2(30 CHAR) NOT NULL,
+ birth_date DATE,
+ ssn CHAR(11 CHAR) NOT NULL CONSTRAINT owner_uq_ssn UNIQUE
+);
+
+
+CREATE TABLE car
+(
+ license_plate_number VARCHAR2(6 CHAR) CONSTRAINT car_pk PRIMARY KEY,
+ color VARCHAR2(10 CHAR),
+ owner_id NUMBER(5) CONSTRAINT car_fk_owner REFERENCES owner,
+ price NUMBER(8,2) CONSTRAINT car_ch_price CHECK (price > 10000)
+);
+
+CREATE TABLE patron AS
+ SELECT last_name, first_name, to_char(birth_date, 'YYYY.MM.DD') bdate
+ FROM BOOK_LIBRARY.customers;
+
+
+CREATE VIEW patrons AS
+ SELECT last_name, first_name, to_char(birth_date, 'YYYY.MM.DD') bdate
+ FROM BOOK_LIBRARY.customers;
+ 
+ 
+ SELECT * FROM patrons;
+ 
+ 
+ DROP TABLE owner CASCADE CONSTRAINTS;
+ 
+ 
+ --DML
+ 
+ INSERT into m_car
+    SELECT * FROM carmechanic.m_car
+        WHERE  c_id IN
+            (SELECT car_id FROM carmechanic.m_repair
+                GROUP BY car_id
+                    HAVING COUNT(*) >3);
+                    
+                    
+UPDATE m_works for
+    SET salary = salary * (select months_between(sysdate, birth_date)
+    from m_mechanic
+    where m_id = mechanic_id)
+    WHERE mechanic_id in
+    (SELECT m_id FROM m_mechanic
+     where extract(year from birth_date)=1990);
+ 
+ 
